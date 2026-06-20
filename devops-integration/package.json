@@ -1,0 +1,23 @@
+{
+  "name": "member3-devops-integration",
+  "version": "1.0.0",
+  "description": "Express server, GitHub webhook listener, Agent 1 (Log Parser), Agent 4 (Git Bridge)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "octokit": "^4.0.2",
+    "simple-git": "^3.36.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
