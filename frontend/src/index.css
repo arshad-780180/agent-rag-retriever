@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  background: #090d12;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #090d12;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg border border-brand-border bg-brand-bg shadow-sm;
+  }
+
+  .pipeline-node {
+    @apply flex h-10 w-10 items-center justify-center rounded-lg border border-brand-border bg-brand-surface font-mono text-xs font-bold text-brand-muted transition-all duration-300;
+  }
+
+  .pipeline-node.active {
+    @apply border-brand-accent bg-brand-accent/10 text-brand-accent shadow-[0_0_18px_rgba(61,214,198,0.22)];
+  }
+
+  .pipeline-node.done {
+    @apply border-brand-green/70 bg-brand-green/10 text-brand-green;
+  }
+
+  .pipeline-node.error {
+    @apply border-brand-red/70 bg-brand-red/10 text-brand-red;
+  }
+
+  .pipeline-step {
+    @apply flex min-w-0 flex-col items-center gap-1;
+  }
+
+  .badge-critical,
+  .badge-high,
+  .badge-medium,
+  .badge-low {
+    @apply rounded-full border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase;
+  }
+
+  .badge-critical {
+    @apply border-brand-red/50 bg-brand-red/10 text-brand-red;
+  }
+
+  .badge-high {
+    @apply border-brand-amber/50 bg-brand-amber/10 text-brand-amber;
+  }
+
+  .badge-medium {
+    @apply border-brand-accent/50 bg-brand-accent/10 text-brand-accent;
+  }
+
+  .badge-low {
+    @apply border-brand-green/50 bg-brand-green/10 text-brand-green;
+  }
+
+  .scanline::after {
+    content: '';
+    pointer-events: none;
+    @apply absolute inset-x-0 bottom-0 h-px bg-brand-accent/40;
+  }
+
+  .log-stream {
+    scrollbar-color: #26333f transparent;
+    scrollbar-width: thin;
+  }
+
+  .log-stream::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .log-stream::-webkit-scrollbar-thumb {
+    background: #26333f;
+    border-radius: 999px;
+  }
+}
