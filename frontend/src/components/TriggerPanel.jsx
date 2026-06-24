@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Play, Zap } from 'lucide-react'
-import { triggerMockIncident } from '../utils/api'
+import { triggerIncident } from '../utils/api'
 
 const MOCK_LOGS = [
   {
@@ -49,9 +49,9 @@ export default function TriggerPanel({ pipelineStatus }) {
 
     try {
       const logText = useCustom ? customLog : MOCK_LOGS[selected].log
-      await triggerMockIncident({ log: logText, source: 'dashboard' })
+      await triggerIncident({ rawLog: logText, source: 'dashboard' })
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Failed to trigger incident')
+      setError(err.message || 'Failed to trigger incident')
     } finally {
       setLoading(false)
     }

@@ -1,21 +1,28 @@
-const MOCK_TRIGGER_EVENT = 'incident:mock-trigger'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
-export async function triggerMockIncident(payload) {
-  const detail = {
-    log: payload?.log || payload?.rawLog || '',
-    source: payload?.source || 'dashboard',
-  }
+export async function triggerIncident(payload) {
+  const rawLog = payload?.rawLog || payload?.log || ''
 
-  if (!detail.log.trim()) {
+  if (!rawLog.trim()) {
     throw new Error('Log text is required to trigger an incident.')
   }
 
-  window.dispatchEvent(new CustomEvent(MOCK_TRIGGER_EVENT, { detail }))
-  return { queued: true }
-}
+  const response = await fetch(`${API_BASE_URL}/agents/trigger-incident`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      rawLog,
+      source: payload?.source || 'dashboard',
+    }),
+  })
 
-export function subscribeToMockIncidents(handler) {
-  const listener = (event) => handler(event.detail)
-  window.addEventListener(MOCK_TRIGGER_EVENT, listener)
-  return () => window.removeEventListener(MOCK_TRIGGER_EVENT, listener)
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(data.error || `Trigger failed with HTTP ${response.status}`)
+  }
+
+  return data
 }

@@ -12,6 +12,7 @@ export default function Header({ pipelineStatus, sseConnected }) {
   const statusColor = {
     idle: 'text-brand-muted',
     running: 'text-brand-accent',
+    waiting: 'text-brand-amber',
     done: 'text-brand-green',
     error: 'text-brand-red',
   }[pipelineStatus] || 'text-brand-muted'
@@ -47,7 +48,7 @@ export default function Header({ pipelineStatus, sseConnected }) {
               <WifiOff size={13} className="text-brand-red" />
             )}
             <span className={sseConnected ? 'text-brand-green' : 'text-brand-red'}>
-              {sseConnected ? 'SSE Live' : 'Demo Mode'}
+              {sseConnected ? 'SSE Live' : 'Backend Offline'}
             </span>
           </div>
 

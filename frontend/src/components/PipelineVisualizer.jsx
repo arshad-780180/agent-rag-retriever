@@ -125,6 +125,7 @@ function PipelineStatusBadge({ status }) {
       label: 'Running',
       className: 'text-brand-accent border-brand-accent/40 animate-pulse',
     },
+    waiting: { label: 'Waiting', className: 'text-brand-amber border-brand-amber/40' },
     done: { label: 'Complete', className: 'text-brand-green border-brand-green/40' },
     error: { label: 'Failed', className: 'text-brand-red border-brand-red/40' },
   }
