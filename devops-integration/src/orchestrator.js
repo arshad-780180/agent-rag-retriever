@@ -55,7 +55,7 @@ async function runTriagePipeline({ incidentId, rawLog, source, repoPath, repoUrl
   // STEP 2: RAG RETRIEVER (Agent 2)
   // ==========================================
   try {
-    publish('agent:start', { agent: 'rag_retriever', incidentId });
+    publish('agent:start', { agent: 'rag', incidentId });
     publish('log', { level: 'info', msg: `[Agent 2] Retrieving code context for ${parsedLog.parsedFilePath || 'vague error'}...` });
 
     const res2 = await fetch('http://127.0.0.1:8000/get-context', {
@@ -72,10 +72,10 @@ async function runTriagePipeline({ incidentId, rawLog, source, repoPath, repoUrl
     if (!res2.ok) throw new Error(await res2.text());
     contextData = await res2.json();
 
-    publish('agent:done', { agent: 'rag_retriever', incidentId, result: contextData });
-    publish('log', { level: 'success', agent: 'rag_retriever', msg: `Retrieved context via ${contextData.retrieval_method}` });
+    publish('agent:done', { agent: 'rag', incidentId, result: contextData });
+    publish('log', { level: 'success', agent: 'rag', msg: `Retrieved context via ${contextData.retrieval_method}` });
   } catch (err) {
-    handleError('rag_retriever', incidentId, err);
+    handleError('rag', incidentId, err);
     return;
   }
 

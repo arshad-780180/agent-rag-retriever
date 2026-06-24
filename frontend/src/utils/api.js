@@ -1,10 +1,10 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 export async function triggerIncident(payload) {
-  const targetFile = payload?.targetFile
+  const difficulty = payload?.difficulty
 
-  if (!targetFile || typeof targetFile !== 'string') {
-    throw new Error('targetFile is required to trigger a push.')
+  if (!difficulty || typeof difficulty !== 'string') {
+    throw new Error('difficulty is required to trigger a push.')
   }
 
   const response = await fetch(`${API_BASE_URL}/agents/trigger-git-push`, {
@@ -13,7 +13,7 @@ export async function triggerIncident(payload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      targetFile,
+      difficulty,
       source: payload?.source || 'dashboard',
     }),
   })

@@ -87,10 +87,18 @@ function extractFileAndLine(rawLog) {
  * since that's what Member 1's repoPath + parsedFilePath join expects.
  */
 function normalizeFilePath(filePath) {
-  return filePath
+  let normalized = filePath
     .replace(/\\/g, '/')          // windows -> unix slashes
     .replace(/^\.\//, '')         // strip leading ./
     .replace(/^\/+/, '');         // strip leading absolute slash
+    
+  // Strip GitHub Actions runner prefix (e.g., home/runner/work/repo/repo/)
+  const ghActionMatch = normalized.match(/^home\/runner\/work\/[^/]+\/[^/]+\/(.*)/);
+  if (ghActionMatch) {
+    normalized = ghActionMatch[1];
+  }
+  
+  return normalized;
 }
 
 /**

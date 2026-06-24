@@ -39,9 +39,8 @@ class ContextEngine:
 
         chunks_indexed = 0
         for root, dirs, files in os.walk(repo_path):
-            # Bypass operational and hidden directories
-            if any(ignored in root for ignored in [".git", "node_modules", "chroma_db_storage", "dist"]):
-                continue
+            # Prune operational and hidden directories in-place so os.walk skips them
+            dirs[:] = [d for d in dirs if d not in [".git", "node_modules", "chroma_db_storage", "dist", ".next", "__pycache__"]]
                 
             for file in files:
                 if file.endswith(('.js', '.jsx', '.ts', '.tsx', '.py', '.json')):

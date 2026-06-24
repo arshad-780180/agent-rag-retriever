@@ -29,13 +29,27 @@ router.post('/parse-log', (req, res) => {
 // DASHBOARD: POST /agents/trigger-git-push
 // ------------------------------------------
 router.post('/trigger-git-push', async (req, res) => {
-  const { targetFile } = req.body;
+  const { difficulty } = req.body;
 
-  if (!targetFile || typeof targetFile !== 'string') {
-    return res.status(400).json({ error: 'Missing "targetFile" field in request body.' });
+  if (!difficulty || !['easy', 'medium', 'hard'].includes(difficulty.toLowerCase())) {
+    return res.status(400).json({ error: 'Missing or invalid "difficulty" field. Must be easy, medium, or hard.' });
   }
 
   const repoPath = path.resolve(__dirname, '../../..');
+  const difficultyDir = path.join(repoPath, 'qa_dummy_bugs', difficulty.toLowerCase());
+  let targetFile = '';
+
+  try {
+    const files = fs.readdirSync(difficultyDir);
+    if (files.length === 0) {
+      return res.status(500).json({ error: `No bug files found for difficulty: ${difficulty}` });
+    }
+    const randomFile = files[Math.floor(Math.random() * files.length)];
+    targetFile = `qa_dummy_bugs/${difficulty.toLowerCase()}/${randomFile}`;
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to read bug directory', details: err.message });
+  }
+
   const git = simpleGit(repoPath);
 
   try {
