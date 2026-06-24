@@ -1,1 +1,1 @@
-qa_dummy_bugs/auth_bug.js
+qa_dummy_bugs/easy/bug_10.js
