@@ -39,9 +39,23 @@ router.post('/trigger-git-push', async (req, res) => {
   const git = simpleGit(repoPath);
 
   try {
+    // 0. Fetch ngrok url
+    let ngrokUrl = 'http://localhost:4000';
+    try {
+      const resp = await fetch('http://localhost:4040/api/tunnels');
+      const data = await resp.json();
+      if (data.tunnels && data.tunnels.length > 0) {
+        ngrokUrl = data.tunnels[0].public_url;
+      }
+    } catch(e) { console.error('Failed to get ngrok url:', e.message); }
+
     // 1. Write the target to ci_target.txt
     const targetFilePath = path.join(repoPath, 'ci_target.txt');
     fs.writeFileSync(targetFilePath, targetFile);
+
+    // Write ngrok_url.txt
+    const ngrokFilePath = path.join(repoPath, 'ngrok_url.txt');
+    fs.writeFileSync(ngrokFilePath, ngrokUrl);
 
     // 2. Touch the file to ensure a diff
     const absoluteTargetFile = path.join(repoPath, targetFile);
@@ -52,7 +66,7 @@ router.post('/trigger-git-push', async (req, res) => {
     }
 
     // 3. Commit and push
-    await git.add(['ci_target.txt', targetFile]);
+    await git.add(['ci_target.txt', 'ngrok_url.txt', targetFile]);
     await git.commit(`Automated CI trigger for ${targetFile}`);
     await git.push('origin', 'main');
 

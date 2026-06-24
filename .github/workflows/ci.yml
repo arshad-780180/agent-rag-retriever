@@ -39,7 +39,11 @@ jobs:
           TARGET=$(cat ci_target.txt)
           echo "Running targeted bug script: $TARGET"
           
-          if [[ $TARGET == *.js ]]; then
+          # Create a wrapper if it's auth_bug.js so it actually throws the error
+          if [[ "$TARGET" == "qa_dummy_bugs/auth_bug.js" ]]; then
+            echo "const { loginUser } = require('./qa_dummy_bugs/auth_bug.js'); loginUser({}, {});" > run_wrapper.js
+            node run_wrapper.js
+          elif [[ $TARGET == *.js ]]; then
             node "$TARGET"
           elif [[ $TARGET == *.ts ]]; then
             tsx "$TARGET"
@@ -49,3 +53,12 @@ jobs:
             echo "Unknown file type: $TARGET"
             exit 1
           fi
+
+      - name: Trigger Webhook on Failure
+        if: failure()
+        run: |
+          echo "Sending webhook to orchestrator..."
+          NGROK_URL=$(cat ngrok_url.txt)
+          curl -X POST "$NGROK_URL/webhook/github" \
+            -H "Content-Type: application/json" \
+            -d "{\"action\": \"completed\", \"workflow_run\": {\"conclusion\": \"failure\", \"id\": ${{ github.run_id }}, \"repository\": {\"full_name\": \"${{ github.repository }}\"} } }"
