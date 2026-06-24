@@ -31,7 +31,7 @@ app = FastAPI(
 
 DB_PATH = os.getenv("AGENT3_DB_PATH", "agent3_repairs.db")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-GEMINI_MODEL_NAME = os.getenv("AGENT3_MODEL", "gemini-1.5-flash")
+GEMINI_MODEL_NAME = os.getenv("AGENT3_MODEL", "gemini-2.5-flash")
 
 
 PRINCIPAL_SRE_SYSTEM_PROMPT = """

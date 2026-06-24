@@ -1,19 +1,19 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 export async function triggerIncident(payload) {
-  const rawLog = payload?.rawLog || payload?.log || ''
+  const targetFile = payload?.targetFile
 
-  if (!rawLog.trim()) {
-    throw new Error('Log text is required to trigger an incident.')
+  if (!targetFile || typeof targetFile !== 'string') {
+    throw new Error('targetFile is required to trigger a push.')
   }
 
-  const response = await fetch(`${API_BASE_URL}/agents/trigger-incident`, {
+  const response = await fetch(`${API_BASE_URL}/agents/trigger-git-push`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      rawLog,
+      targetFile,
       source: payload?.source || 'dashboard',
     }),
   })

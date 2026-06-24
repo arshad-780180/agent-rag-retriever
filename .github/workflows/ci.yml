@@ -1,0 +1,51 @@
+name: CI Bug Runner
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'qa_dummy_bugs/**'
+      - 'ci_target.txt'
+
+jobs:
+  test-bug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          npm install -g tsx
+          
+      - name: Run Targeted Bug
+        run: |
+          if [ ! -f ci_target.txt ]; then
+            echo "ci_target.txt not found. Exiting cleanly."
+            exit 0
+          fi
+          
+          TARGET=$(cat ci_target.txt)
+          echo "Running targeted bug script: $TARGET"
+          
+          if [[ $TARGET == *.js ]]; then
+            node "$TARGET"
+          elif [[ $TARGET == *.ts ]]; then
+            tsx "$TARGET"
+          elif [[ $TARGET == *.py ]]; then
+            python "$TARGET"
+          else
+            echo "Unknown file type: $TARGET"
+            exit 1
+          fi

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import AuditPanel from './components/AuditPanel'
 import Header from './components/Header'
 import IncidentHistory from './components/IncidentHistory'
 import LogStream from './components/LogStream'
@@ -18,7 +17,6 @@ export default function App() {
     logs,
     parsedError,
     patch,
-    auditResult,
     prUrl,
     incidents,
   } = usePipeline()
@@ -68,9 +66,8 @@ export default function App() {
 
             <LogStream logs={logs} />
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4">
               <ParsedErrorCard parsedError={parsedError} />
-              <AuditPanel auditResult={auditResult} />
             </div>
 
             <PatchDiffViewer patch={patch} prUrl={prUrl} />

@@ -17,6 +17,8 @@ const express = require('express');
 const router = express.Router();
 const { verifyGitHubSignature } = require('../utils/verifySignature');
 const { parseLog } = require('../agents/agent1-logParser');
+const { runTriagePipeline } = require('../orchestrator');
+const path = require('path');
 
 // We need the RAW body (not JSON-parsed) to verify GitHub's signature,
 // so we use express.raw() here instead of express.json().
@@ -55,6 +57,8 @@ router.post('/github', (req, res) => {
   });
 });
 
+const { Octokit } = require('octokit');
+
 /**
  * Routes the verified GitHub event to the right handling logic.
  * For now we focus on 'workflow_run' (CI failures) and a generic
@@ -69,11 +73,42 @@ async function handleGitHubEvent(event, payload) {
       return;
     }
     console.log('[Webhook] Detected a FAILED workflow run. Extracting details...');
-    // In a real run, you'd fetch the actual job logs here via the GitHub API
-    // (GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs) using an
-    // authenticated octokit client. For now we log what we have.
-    console.log('[Webhook] Repo:', payload.repository?.full_name);
-    console.log('[Webhook] Run URL:', payload.workflow_run?.html_url);
+    
+    try {
+      const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+      
+      const { data: jobsData } = await octokit.rest.actions.listJobsForWorkflowRun({
+        owner: payload.repository.owner.login,
+        repo: payload.repository.name,
+        run_id: payload.workflow_run.id
+      });
+      
+      const failedJob = jobsData.jobs.find(j => j.conclusion === 'failure');
+      if (!failedJob) {
+        console.warn('[Webhook] Could not find a specific failed job for this run.');
+        return;
+      }
+      
+      const { data: logData } = await octokit.rest.actions.downloadJobLogsForWorkflowRun({
+        owner: payload.repository.owner.login,
+        repo: payload.repository.name,
+        job_id: failedJob.id
+      });
+      
+      console.log(`[Webhook] Fetched logs for job ${failedJob.name}. Size: ${logData.length} bytes.`);
+      
+      const incidentId = `INC-${Date.now().toString().slice(-6)}`;
+      
+      runTriagePipeline({
+        incidentId,
+        rawLog: logData, // Pass the raw job log! Agent 1 will parse it!
+        source: 'github-actions',
+        repoPath: path.resolve(__dirname, '../../..'),
+        repoUrl: payload.repository.clone_url || 'https://github.com/arshad-780180/agent-rag-retriever.git'
+      });
+    } catch (error) {
+      console.error('[Webhook] Failed to fetch job logs from GitHub:', error.message);
+    }
     return;
   }
 
@@ -85,10 +120,17 @@ async function handleGitHubEvent(event, payload) {
       console.warn('[Webhook] No errorLog found in simulated payload.');
       return;
     }
-    console.log('[Webhook] Running Agent 1 (log parser) on simulated log...');
-    const parsed = parseLog(rawLog);
-    console.log('[Webhook] Agent 1 output:', JSON.stringify(parsed, null, 2));
-    // TODO (team contract pending): hand `parsed` off to orchestrator.js
+    
+    const incidentId = `INC-${Date.now().toString().slice(-6)}`;
+    
+    // Pass off to orchestrator
+    runTriagePipeline({
+      incidentId,
+      rawLog,
+      source: 'webhook',
+      repoPath: path.resolve(__dirname, '../../..'),
+      repoUrl: 'https://github.com/arshad-780180/agent-rag-retriever.git'
+    });
     return;
   }
 

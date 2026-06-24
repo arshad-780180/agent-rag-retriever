@@ -6,7 +6,6 @@ export const AGENTS = [
   { id: 'rag', label: 'RAG Retriever', icon: 'RAG', member: 'Member 1' },
   { id: 'code_repair', label: 'Code Repair', icon: 'CR', member: 'Member 2' },
   { id: 'git_bridge', label: 'Git Bridge', icon: 'GB', member: 'Member 3' },
-  { id: 'auditor', label: 'Auditor', icon: 'AU', member: 'Member 5' },
 ]
 
 const AGENT_LABELS = Object.fromEntries(AGENTS.map((agent) => [agent.id, agent.label]))
@@ -96,7 +95,6 @@ export function usePipeline() {
 
         if (data.agent === 'log_parser' && data.result) setParsedError(normalizeParsedError(data.result))
         if (data.agent === 'code_repair' && data.result) setPatch(data.result)
-        if (data.agent === 'auditor' && data.result) setAuditResult(data.result)
         if (data.agent === 'git_bridge' && data.result?.prUrl) setPrUrl(data.result.prUrl)
         break
       }
@@ -146,7 +144,7 @@ export function usePipeline() {
         setActiveIncident(null)
         addLog({ level: 'success', msg: `Pipeline complete. PR: ${resolvedPrUrl || 'N/A'}` })
 
-        if (resolvedPrUrl || audit?.confidenceScore != null || data.status === 'resolved') {
+        if (resolvedPrUrl || data.status === 'resolved') {
           setIncidents((previous) => [
             {
               id: data.incidentId || Date.now(),
@@ -155,7 +153,6 @@ export function usePipeline() {
               severity: parsed?.severity || 'medium',
               file: parsed?.file || 'Unknown file',
               prUrl: resolvedPrUrl,
-              confidence: audit?.confidenceScore,
               status: 'resolved',
             },
             ...previous,

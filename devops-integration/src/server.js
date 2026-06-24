@@ -33,6 +33,6 @@ app.listen(PORT, () => {
   console.log(`[Server] Webhook endpoint:        POST http://localhost:${PORT}/webhook/github`);
   console.log(`[Server] Agent 1 (parse-log):     POST http://localhost:${PORT}/agents/parse-log`);
   console.log(`[Server] Dashboard SSE:           GET  http://localhost:${PORT}/events`);
-  console.log(`[Server] Dashboard trigger:       POST http://localhost:${PORT}/agents/trigger-incident`);
+  console.log(`[Server] Dashboard trigger:       POST http://localhost:${PORT}/agents/trigger-git-push`);
   console.log(`[Server] Agent 4 (create-pr):     POST http://localhost:${PORT}/agents/create-pr`);
 });
