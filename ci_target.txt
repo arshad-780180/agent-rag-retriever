@@ -1,1 +1,1 @@
-qa_dummy_bugs/hard/bug_17.js
+qa_dummy_bugs/medium/bug_15.js
