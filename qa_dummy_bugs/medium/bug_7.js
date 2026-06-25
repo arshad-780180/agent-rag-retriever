@@ -1,4 +1,4 @@
-// Medium Bug 7
-Promise.reject(new Error("Unhandled promise rejection: database timeout"));
-setTimeout(() => {}, 100);
-// Triggering CI failure 1782362653762
+--- a/qa_dummy_bugs/medium/bug_7.js
++++ b/qa_dummy_bugs/medium/bug_7.js
+@@
+# No automatic patch was generated because the LLM request failed.
